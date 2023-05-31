@@ -2,17 +2,21 @@
 
 require 'vendor/autoload.php';
 
+// load env
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
+
 use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
 
 // The same options that can be provided to a specific client constructor can also be supplied to the Aws\Sdk class.
 // Use the us-west-2 region and latest version of each client.
 $sharedConfig = [
-    'region' => 'us-east-2',
+    'region' => $_ENV['S3_REGION'],
     'version' => 'latest',
     'credentials' => [
-        'key'    => 'AKIATKUD625AG7QODDO7',
-        'secret' => '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',
+        'key'    => $_ENV['AWS_KEY'],
+        'secret' => $_ENV['AWS_SECRET'],
         // 'token'  => $result['Credentials']['SessionToken']
     ]
 ];
@@ -21,7 +25,7 @@ $sdk = new Aws\Sdk($sharedConfig);
 // Create an Amazon S3 client using the shared configuration data.
 $s3client = $sdk->createS3();
 
-$bucket_name = 'nobrega-test01';
+$bucket_name = $_ENV['S3_BUCKET'];
 
 // List Objects
 list_objects($s3client, $bucket_name);
@@ -33,6 +37,7 @@ get_object($s3client, $bucket_name, $object_key);
 // Put Objects
 $file_path = 'images/rocket.png';
 put_object($s3client, $bucket_name, $file_path);
+
 
 function list_objects($s3client, $bucket_name) {
     try {
